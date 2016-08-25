@@ -1,6 +1,6 @@
 AM_CPPFLAGS=-I$(top_srcdir)/src
 LDADD=$(top_srcdir)/src/.libs/libanet.a 
-AM_LDFLAGS=-lpthread -ldl
+AM_LDFLAGS=-pthread -ldl
 
 test_sources= sockettf.cpp packetqueuetf.cpp
 

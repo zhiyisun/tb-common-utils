@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" == "clean" ]; then
+if [ "$1" = "clean" ]; then
    rm -rf aclocal.m4 autom4te.cache config.guess config.sub configure depcomp INSTALL install-sh ltmain.sh missing 
    find . -name 'Makefile' -exec rm -f {} \;
    find . -name 'Makefile.in' -exec rm -f {} \;

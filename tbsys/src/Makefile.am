@@ -8,7 +8,7 @@ source_list=config.cpp defaultrunnable.cpp filequeue.cpp \
             Timer.cpp ThreadPool.cpp Service.cpp\
             Network.cpp profiler.cpp bytebuffer.cpp WarningBuffer.cpp 
 
-AM_LDFLAGS="-lpthread -lm -lrt"
+AM_LDFLAGS=-pthread -lm -lrt
 lib_LTLIBRARIES=libtbsys.la
 libtbsys_la_SOURCES=$(source_list)
 libtbsys_la_LDFLAGS=$(AM_LDFLAGS) -static-libgcc

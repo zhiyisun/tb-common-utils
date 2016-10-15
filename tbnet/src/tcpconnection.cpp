@@ -153,9 +153,10 @@ bool TCPConnection::readData() {
         ret = _socket->read(_input.getFree(), _input.getFreeLen());
         readCnt++;
     }
-
+#define ZHIYI_DEBUG
+#ifndef ZHIYI_DEBUG
     _socket->setTcpQuickAck(true);
-
+#endif
     // 是否为批量回调
     if (_isServer && _serverAdapter->_batchPushPacket && _inputQueue.size() > 0) {
         _serverAdapter->handleBatchPacket(this, _inputQueue);

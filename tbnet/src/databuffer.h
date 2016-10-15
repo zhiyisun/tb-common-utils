@@ -16,6 +16,8 @@
 #ifndef TBNET_DATA_BUFFER_H_
 #define TBNET_DATA_BUFFER_H_
 
+#define ZHIYI_DEBUG
+
 #define MAX_BUFFER_SIZE 2048
 
 namespace tbnet {
@@ -122,9 +124,18 @@ public:
 
     void writeInt16(uint16_t n) {
         expand(2);
+#ifdef ZHIYI_DEBUG
+	uint16_t * temp_ptr = (uint16_t *) _pfree;
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+	*temp_ptr = __builtin_bswap16(n);
+#else
+	*temp_ptr = arm_bswap16(n);
+#endif
+#else
         _pfree[1] = (unsigned char)n;
         n = static_cast<uint16_t>(n >> 8);
         _pfree[0] = (unsigned char)n;
+#endif
         _pfree += 2;
     }
 
@@ -133,6 +144,10 @@ public:
      */
     void writeInt32(uint32_t n) {
         expand(4);
+#ifdef ZHIYI_DEBUG
+	uint32_t * temp_ptr = (uint32_t *) _pfree;
+	*temp_ptr = __builtin_bswap32(n);
+#else
         _pfree[3] = (unsigned char)n;
         n >>= 8;
         _pfree[2] = (unsigned char)n;
@@ -140,11 +155,16 @@ public:
         _pfree[1] = (unsigned char)n;
         n >>= 8;
         _pfree[0] = (unsigned char)n;
+#endif
         _pfree += 4;
     }
 
     void writeInt64(uint64_t n) {
         expand(8);
+#ifdef ZHIYI_DEBUG
+	uint64_t * temp_ptr = (uint64_t *) _pfree;
+	*temp_ptr = __builtin_bswap64(n);
+#else
         _pfree[7] = (unsigned char)n;
         n >>= 8;
         _pfree[6] = (unsigned char)n;
@@ -160,6 +180,7 @@ public:
         _pfree[1] = (unsigned char)n;
         n >>= 8;
         _pfree[0] = (unsigned char)n;
+#endif
         _pfree += 8;
     }
 
@@ -177,12 +198,25 @@ public:
     }
 
     void fillInt16(unsigned char *dst, uint16_t n) {
+#ifdef ZHIYI_DEBUG
+	uint16_t * temp_ptr = (uint16_t *) dst;
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+	*temp_ptr = __builtin_bswap16(n);
+#else
+	*temp_ptr = arm_bswap16(n);
+#endif
+#else
         dst[1] = (unsigned char)n;
         n = static_cast<uint16_t>(n >> 8);
         dst[0] = (unsigned char)n;
+#endif
     }
 
     void fillInt32(unsigned char *dst, uint32_t n) {
+#ifdef ZHIYI_DEBUG
+	uint32_t * temp_ptr = (uint32_t *) dst;
+	*temp_ptr = __builtin_bswap32(n);
+#else
         dst[3] = (unsigned char)n;
         n >>= 8;
         dst[2] = (unsigned char)n;
@@ -190,9 +224,14 @@ public:
         dst[1] = (unsigned char)n;
         n >>= 8;
         dst[0] = (unsigned char)n;
+#endif
     }
    
     void fillInt64(unsigned char *dst, uint64_t n) {
+#ifdef ZHIYI_DEBUG
+	uint64_t * temp_ptr = (uint64_t *) dst;
+	*temp_ptr = __builtin_bswap64(n);
+#else
         dst[7] = (unsigned char)n;
         n >>= 8;
         dst[6] = (unsigned char)n;
@@ -208,6 +247,7 @@ public:
         dst[1] = (unsigned char)n;
         n >>= 8;
         dst[0] = (unsigned char)n;
+#endif
     }
 
     /*
@@ -271,14 +311,29 @@ public:
     }
 
     uint16_t readInt16() {
+#ifdef ZHIYI_DEBUG
+	uint16_t * temp_ptr = (uint16_t *) _pdata;
+	uint16_t n = (uint16_t) *temp_ptr;
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+	n = __builtin_bswap16(n);
+#else
+	n = arm_bswap16(n);
+#endif
+#else
         uint16_t n = _pdata[0];
         n = static_cast<uint16_t>(n << 8);
         n = static_cast<uint16_t>(n | _pdata[1]);
+#endif
         _pdata += 2;
         return n;
     }
 
     uint32_t readInt32() {
+#ifdef ZHIYI_DEBUG
+	uint32_t * temp_ptr = (uint32_t *) _pdata;
+	uint32_t n = (uint32_t) *temp_ptr;
+	n = __builtin_bswap32(n);
+#else
         uint32_t n = _pdata[0];
         n <<= 8;
         n |= _pdata[1];
@@ -286,12 +341,18 @@ public:
         n |= _pdata[2];
         n <<= 8;
         n |= _pdata[3];
+#endif
         _pdata += 4;
         assert(_pfree>=_pdata);
         return n;
     }
 
     uint64_t readInt64() {
+#ifdef ZHIYI_DEBUG
+	uint64_t * temp_ptr = (uint64_t *) _pdata;
+	uint64_t n = (uint64_t) *temp_ptr;
+	n = __builtin_bswap64(n);
+#else
         uint64_t n = _pdata[0];
         n <<= 8;
         n |= _pdata[1];
@@ -307,6 +368,7 @@ public:
         n |= _pdata[6];
         n <<= 8;
         n |= _pdata[7];
+#endif
         _pdata += 8;
         assert(_pfree>=_pdata);
         return n;
@@ -445,6 +507,18 @@ private:
         }
     }
 
+#if !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+	static inline uint16_t arm_bswap16(uint16_t _x)
+	{
+		register uint16_t x = _x; 
+
+		asm volatile ("rev16 %0,%1"
+				: "=r" (x) 
+				: "r" (x) 
+				);  
+		return x;
+	}
+#endif
 
 private:
     unsigned char *_pstart;      // buffer¿ªÊ¼

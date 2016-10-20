@@ -58,6 +58,15 @@ bool HttpPacketStreamer::getPacketInfo(DataBuffer *input, PacketHeader *header, 
     return true;
 }
 
+Packet* DefaultHttpPacketFactory::createPacket(int pcode) {
+	if (pcode == 1) {
+	    return new HttpRequestPacket();
+	} else {
+	    return new HttpResponsePacket();
+	}
+}
+
+
 }
 
 

@@ -16,6 +16,7 @@
 #ifndef TBNET_HTTP_PACKET_STREAMER_H
 #define TBNET_HTTP_PACKET_STREAMER_H
 
+
 namespace tbnet {
 
 
@@ -51,13 +52,7 @@ private:
  */
 class DefaultHttpPacketFactory : public IPacketFactory {
 public:
-    Packet *createPacket(int pcode) {
-        if (pcode == 1) {
-            return new HttpRequestPacket();
-        } else {
-            return new HttpResponsePacket();
-        }
-    }
+    Packet *createPacket(int pcode); 
 };
 
 }

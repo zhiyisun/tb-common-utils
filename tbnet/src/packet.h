@@ -16,6 +16,8 @@
 #ifndef TBNET_PACKET_H_
 #define TBNET_PACKET_H_
 
+#define ZHIYI_DEBUG
+
 namespace tbnet {
 
 #define TBNET_PACKET_FLAG 0x416e4574  // AnEt
@@ -58,7 +60,11 @@ public:
     /*
      * …Ë÷√PCode
      */
+#ifdef ZHIYI_DEBUG
+    inline void setPCode(int pcode) {
+#else
     void setPCode(int pcode) {
+#endif
         _packetHeader._pcode = pcode;
     }
 

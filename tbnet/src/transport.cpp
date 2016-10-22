@@ -14,7 +14,6 @@
  */
 
 #include "tbnet.h"
-
 namespace tbnet {
 
 /*

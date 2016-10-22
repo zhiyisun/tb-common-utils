@@ -48,24 +48,43 @@ public:
             _pend = _pfree = _pdata = _pstart = NULL;
         }
     }
-
+#ifdef ZHIYI_DEBUG
+    inline char *getData() {
+#else
     char *getData() {
+#endif
         return (char*)_pdata;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline int getDataLen() {
+#else
     int getDataLen() {
+#endif
         return static_cast<int32_t>(_pfree - _pdata);
     }
 
+#ifdef ZHIYI_DEBUG
+    inline char *getFree() {
+#else
     char *getFree() {
+#endif
         return (char*)_pfree;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline int getFreeLen() {
+#else
     int getFreeLen() {
+#endif
         return static_cast<int32_t>(_pend - _pfree);
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void drainData(int len) {
+#else
     void drainData(int len) {
+#endif
         _pdata += len;
 
         if (_pdata >= _pfree) {
@@ -73,21 +92,37 @@ public:
         }
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void pourData(int len) {
+#else
     void pourData(int len) {
+#endif
         assert(_pend - _pfree >= len);
         _pfree += len;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void stripData(int len) {
+#else
     void stripData(int len) {
+#endif
         assert(_pfree - _pdata >= len);
         _pfree -= len;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void clear() {
+#else
     void clear() {
+#endif
         _pdata = _pfree = _pstart;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void shrink() {
+#else
     void shrink() {
+#endif
         if (_pstart == NULL) {
             return;
         }
@@ -117,12 +152,20 @@ public:
     /*
      * 写函数
      */
+#ifdef ZHIYI_DEBUG
+    inline void writeInt8(uint8_t n) {
+#else
     void writeInt8(uint8_t n) {
+#endif
         expand(1);
         *_pfree++ = (unsigned char)n;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeInt16(uint16_t n) {
+#else
     void writeInt16(uint16_t n) {
+#endif
         expand(2);
 #ifdef ZHIYI_DEBUG
 	uint16_t * temp_ptr = (uint16_t *) _pfree;
@@ -142,7 +185,11 @@ public:
     /*
      * 写出整型
      */
+#ifdef ZHIYI_DEBUG
+    inline void writeInt32(uint32_t n) {
+#else
     void writeInt32(uint32_t n) {
+#endif
         expand(4);
 #ifdef ZHIYI_DEBUG
 	uint32_t * temp_ptr = (uint32_t *) _pfree;
@@ -159,7 +206,11 @@ public:
         _pfree += 4;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeInt64(uint64_t n) {
+#else
     void writeInt64(uint64_t n) {
+#endif
         expand(8);
 #ifdef ZHIYI_DEBUG
 	uint64_t * temp_ptr = (uint64_t *) _pfree;
@@ -184,7 +235,11 @@ public:
         _pfree += 8;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeBytes(const void *src, int len) {
+#else
     void writeBytes(const void *src, int len) {
+#endif
         expand(len);
         memcpy(_pfree, src, len);
         _pfree += len;
@@ -193,11 +248,19 @@ public:
     /*
      * 在某一位置写一整型
      */
+#ifdef ZHIYI_DEBUG
+    inline void fillInt8(unsigned char *dst, uint8_t n) {
+#else
     void fillInt8(unsigned char *dst, uint8_t n) {
+#endif
         *dst = n;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void fillInt16(unsigned char *dst, uint16_t n) {
+#else
     void fillInt16(unsigned char *dst, uint16_t n) {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint16_t * temp_ptr = (uint16_t *) dst;
 #if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
@@ -212,7 +275,11 @@ public:
 #endif
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void fillInt32(unsigned char *dst, uint32_t n) {
+#else
     void fillInt32(unsigned char *dst, uint32_t n) {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint32_t * temp_ptr = (uint32_t *) dst;
 	*temp_ptr = __builtin_bswap32(n);
@@ -227,7 +294,11 @@ public:
 #endif
     }
    
+#ifdef ZHIYI_DEBUG
+    inline void fillInt64(unsigned char *dst, uint64_t n) {
+#else
     void fillInt64(unsigned char *dst, uint64_t n) {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint64_t * temp_ptr = (uint64_t *) dst;
 	*temp_ptr = __builtin_bswap64(n);
@@ -253,7 +324,11 @@ public:
     /*
      * 写字符串
      */
+#ifdef ZHIYI_DEBUG
+    inline void writeString(const char *str) {
+#else
     void writeString(const char *str) {
+#endif
         int len = (str ? static_cast<int32_t>(strlen(str)) : 0);
         if (len>0) len ++;
         expand(static_cast<int32_t>(len+sizeof(uint32_t)));
@@ -264,14 +339,22 @@ public:
         }
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeString(const std::string& str) {
+#else
     void writeString(const std::string& str) {
+#endif
         writeString(str.c_str());
     }
 
     /**
      *写一个int列表
      */
+#ifdef ZHIYI_DEBUG
+    inline void writeVector(const std::vector<int32_t>& v) {
+#else
     void writeVector(const std::vector<int32_t>& v) {
+#endif
         const uint32_t iLen = static_cast<uint32_t>(v.size());
         writeInt32(iLen);
         for (uint32_t i = 0; i < iLen; ++i) {
@@ -279,7 +362,11 @@ public:
         }
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeVector(const std::vector<uint32_t>& v) {
+#else
     void writeVector(const std::vector<uint32_t>& v) {
+#endif
         const uint32_t iLen = static_cast<uint32_t>(v.size());
         writeInt32(iLen);
         for (uint32_t i = 0; i < iLen; ++i) {
@@ -287,7 +374,11 @@ public:
         } 
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeVector(const std::vector<int64_t>& v) {
+#else
     void writeVector(const std::vector<int64_t>& v) {
+#endif
         const uint32_t iLen = static_cast<uint32_t>(v.size());
         writeInt32(iLen);
         for (uint32_t i = 0; i < iLen; ++i) {
@@ -295,7 +386,11 @@ public:
         }
     }
 
+#ifdef ZHIYI_DEBUG
+    inline void writeVector(const std::vector<uint64_t>& v) {
+#else
     void writeVector(const std::vector<uint64_t>& v) {
+#endif
         const uint32_t iLen = static_cast<uint32_t>(v.size());
         writeInt32(iLen);
         for (uint32_t i = 0; i < iLen; ++i) {
@@ -306,11 +401,19 @@ public:
     /*
      * 读函数
      */
+#ifdef ZHIYI_DEBUG
+    inline uint8_t readInt8() {
+#else
     uint8_t readInt8() {
+#endif
         return (*_pdata++);
     }
 
+#ifdef ZHIYI_DEBUG
+    inline uint16_t readInt16() {
+#else
     uint16_t readInt16() {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint16_t * temp_ptr = (uint16_t *) _pdata;
 	uint16_t n = (uint16_t) *temp_ptr;
@@ -328,7 +431,11 @@ public:
         return n;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline uint32_t readInt32() {
+#else
     uint32_t readInt32() {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint32_t * temp_ptr = (uint32_t *) _pdata;
 	uint32_t n = (uint32_t) *temp_ptr;
@@ -347,7 +454,11 @@ public:
         return n;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline uint64_t readInt64() {
+#else
     uint64_t readInt64() {
+#endif
 #ifdef ZHIYI_DEBUG
 	uint64_t * temp_ptr = (uint64_t *) _pdata;
 	uint64_t n = (uint64_t) *temp_ptr;
@@ -374,7 +485,11 @@ public:
         return n;
     }
 
+#ifdef ZHIYI_DEBUG
+    inline bool readBytes(void *dst, int len) {
+#else
     bool readBytes(void *dst, int len) {
+#endif
         if (_pdata + len > _pfree) {
             return false;
         }
@@ -387,7 +502,11 @@ public:
     /*
      * 写字符串
      */
+#ifdef ZHIYI_DEBUG
+    inline bool readString(char *&str, int len) {
+#else
     bool readString(char *&str, int len) {
+#endif
         if (_pdata + sizeof(int) > _pfree) {
             return false;
         }
@@ -414,7 +533,11 @@ public:
     /**
      * 读取一列表
      */
+#ifdef ZHIYI_DEBUG
+    inline bool readVector(std::vector<int32_t>& v) {
+#else
     bool readVector(std::vector<int32_t>& v) {
+#endif
          const uint32_t len = readInt32();
          for (uint32_t i = 0; i < len; ++i) {
              v.push_back(readInt32());
@@ -422,7 +545,11 @@ public:
          return true; 
     }
 
+#ifdef ZHIYI_DEBUG
+    inline bool readVector(std::vector<uint32_t>& v) {
+#else
     bool readVector(std::vector<uint32_t>& v) {
+#endif
          const uint32_t len = readInt32();
          for (uint32_t i = 0; i < len; ++i) {
              v.push_back(readInt32());
@@ -430,7 +557,11 @@ public:
          return true; 
     }
 
+#ifdef ZHIYI_DEBUG
+    inline bool readVector(std::vector<int64_t>& v) {
+#else
     bool readVector(std::vector<int64_t>& v) {
+#endif
          const uint32_t len = readInt32();
          for (uint32_t i = 0; i < len; ++i) {
              v.push_back(readInt64());
@@ -438,7 +569,11 @@ public:
          return true; 
     }
 
+#ifdef ZHIYI_DEBUG
+    inline bool readVector(std::vector<uint64_t>& v) {
+#else
     bool readVector(std::vector<uint64_t>& v) {
+#endif
          const uint32_t len = readInt32();
          for (uint32_t i = 0; i < len; ++i) {
              v.push_back(readInt64());
@@ -449,14 +584,22 @@ public:
     /*
      * 确保有len的空余空间
      */
+#ifdef ZHIYI_DEBUG
+    inline void ensureFree(int len) {
+#else
     void ensureFree(int len) {
+#endif
         expand(len);
     }
 
     /*
      * 寻找字符串
      */
+#ifdef ZHIYI_DEBUG
+    inline int findBytes(const char *findstr, int len) {
+#else
     int findBytes(const char *findstr, int len) {
+#endif
         int dLen = static_cast<int32_t>(_pfree - _pdata - len + 1);
         for (int i=0; i<dLen; i++) {
             if (_pdata[i] == findstr[0] && memcmp(_pdata+i, findstr, len) == 0) {

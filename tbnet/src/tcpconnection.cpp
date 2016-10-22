@@ -15,6 +15,8 @@
 
 #include "tbnet.h"
 
+#define ZHIYI_DEBUG
+
 namespace tbnet {
 
 /*
@@ -153,7 +155,6 @@ bool TCPConnection::readData() {
         ret = _socket->read(_input.getFree(), _input.getFreeLen());
         readCnt++;
     }
-#define ZHIYI_DEBUG
 #ifndef ZHIYI_DEBUG
     _socket->setTcpQuickAck(true);
 #endif
